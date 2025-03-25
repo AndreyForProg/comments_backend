@@ -20,10 +20,16 @@ class App {
 
   async setupDatabase() {
     try {
+      console.log('Initializing database connection...')
       await this.database.connect()
-      console.log('Database connected successfully')
+      console.log('Database connected and synchronized successfully')
     } catch (error) {
-      console.error('Database setup error:', error)
+      console.error('Fatal database setup error:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+      })
+      process.exit(1) // Завершаем процесс при критической ошибке
     }
   }
 

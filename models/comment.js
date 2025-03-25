@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'parentId',
         as: 'parent',
       })
+      Comment.hasMany(models.Comment, {
+        foreignKey: 'parentId',
+        as: 'children',
+      })
     }
   }
   Comment.init(

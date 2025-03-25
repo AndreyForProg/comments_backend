@@ -14,35 +14,38 @@ class CommentResolver {
     }
   }
 
-  async getComments(parent, args, context) {
+  async getComments(parent, { limit, offset, orderBy, order }, context) {
     const { db } = context
     const commentService = new CommentService(db)
-    return await commentService.getComments()
+    return await commentService.getComments({ limit, offset, orderBy, order })
   }
 
-  async createComment(_parent, args, context) {
+  async createComment(_parent, { email, nickname, text, parentId, homePage }, context) {
     if (!context || !context.db) {
       throw new Error('Database connection required')
     }
-    if (!args || typeof args !== 'object') {
+    if (!email || !nickname || !text) {
       throw new Error('Invalid input parameters')
     }
-
-    const { email, nickname, text, parentId, homePage } = args
     const { db } = context
     const commentService = new CommentService(db)
-    return await commentService.createComment({ email, nickname, text, parentId, homePage })
+    return await commentService.createComment({
+      email,
+      nickname,
+      text,
+      parentId,
+      homePage,
+    })
   }
 
-  async deleteComment(_parent, args, context) {
+  async deleteComment(_parent, { id }, context) {
     if (!context || !context.db) {
       throw new Error('Database connection required')
     }
-    if (!args || typeof args !== 'object' || !args.id) {
+    if (typeof id === 'undefined') {
       throw new Error('Comment ID is required')
     }
 
-    const { id } = args
     const { db } = context
     const commentService = new CommentService(db)
     return await commentService.deleteComment(id)
