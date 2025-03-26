@@ -1,8 +1,12 @@
 const express = require('express')
 const cors = require('cors')
 const { ApolloServer } = require('apollo-server-express')
+const { graphqlUploadExpress } = require('graphql-upload')
 const schema = require('./graphql/schema')
 const Database = require('./database/Database')
+const { createIndex } = require('../config/elasticConf')
+const FileService = require('./services/FileService')
+const path = require('path')
 
 class App {
   constructor() {
@@ -10,12 +14,55 @@ class App {
     this.database = new Database()
     this.setupMiddlewares()
     this.setupDatabase()
+    this.setupElasticsearch()
     this.setupGraphQL()
+    this.setupFileService()
+    this.setupStaticFiles()
   }
 
   setupMiddlewares() {
-    this.app.use(express.json())
-    this.app.use(cors())
+    // Установка защитных HTTP-заголовков вручную
+    this.app.use((req, res, next) => {
+      res.setHeader('X-XSS-Protection', '1; mode=block')
+      res.setHeader('X-Content-Type-Options', 'nosniff')
+      res.setHeader('X-Frame-Options', 'SAMEORIGIN')
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+      // Базовая политика CSP
+      res.setHeader(
+        'Content-Security-Policy',
+        "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'",
+      )
+      next()
+    })
+
+    this.app.use(
+      express.json({
+        // Ограничение размера JSON-запроса
+        limit: '100kb',
+      }),
+    )
+    this.app.use(
+      graphqlUploadExpress({
+        maxFileSize: 100000, // 100 KB
+        maxFiles: 1,
+      }),
+    )
+    // this.app.use(cors())
+  }
+
+  async setupElasticsearch() {
+    try {
+      console.log('Initializing Elasticsearch...')
+      await createIndex()
+      console.log('Elasticsearch index created successfully')
+    } catch (error) {
+      console.error('Elasticsearch setup error:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name,
+      })
+      console.warn('Application will continue without Elasticsearch functionality')
+    }
   }
 
   async setupDatabase() {
@@ -29,7 +76,7 @@ class App {
         stack: error.stack,
         name: error.name,
       })
-      process.exit(1) // Завершаем процесс при критической ошибке
+      process.exit(1)
     }
   }
 
@@ -50,7 +97,23 @@ class App {
       res.status(200).send('OK')
     })
   }
+
+  async setupFileService() {
+    try {
+      await FileService.init()
+      console.log('File service initialized successfully')
+    } catch (error) {
+      console.error('File service initialization error:', error)
+      console.warn('Application will continue without file upload functionality')
+    }
+  }
+
+  // Хранилище файлов
+  setupStaticFiles() {
+    this.app.use('/files', express.static(path.join(process.cwd(), 'files')))
+  }
 }
 
 const appInstance = new App()
+
 module.exports = { app: appInstance.app }

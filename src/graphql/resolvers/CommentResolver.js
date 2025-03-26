@@ -1,4 +1,5 @@
-const { CommentService, UserService } = require('../../services')
+const { CommentService } = require('../../services')
+const CommentValidator = require('../../services/СommentValidatorService')
 
 class CommentResolver {
   constructor() {
@@ -6,6 +7,7 @@ class CommentResolver {
       Comment: {},
       Query: {
         getComments: this.getComments.bind(this),
+        searchComments: this.searchComments.bind(this),
       },
       Mutation: {
         createComment: this.createComment.bind(this),
@@ -14,19 +16,30 @@ class CommentResolver {
     }
   }
 
-  async getComments(parent, { limit, offset, orderBy, order }, context) {
+  async getComments(parent, { limit, offset, orderBy, order, file }, context) {
     const { db } = context
     const commentService = new CommentService(db)
-    return await commentService.getComments({ limit, offset, orderBy, order })
+    return await commentService.getComments({ limit, offset, orderBy, order, file })
   }
 
-  async createComment(_parent, { email, nickname, text, parentId, homePage }, context) {
+  async createComment(_parent, { email, nickname, text, parentId, homePage, file }, context) {
     if (!context || !context.db) {
       throw new Error('Database connection required')
     }
-    if (!email || !nickname || !text) {
-      throw new Error('Invalid input parameters')
+
+    // Используем валидатор для проверки входных данных
+    const validationResult = CommentValidator.validate({
+      email,
+      nickname,
+      text,
+      homePage,
+    })
+
+    // Если есть ошибки валидации, выбрасываем их
+    if (!validationResult.isValid) {
+      throw new Error(validationResult.errors.join(', '))
     }
+
     const { db } = context
     const commentService = new CommentService(db)
     return await commentService.createComment({
@@ -35,6 +48,7 @@ class CommentResolver {
       text,
       parentId,
       homePage,
+      file,
     })
   }
 
@@ -49,6 +63,15 @@ class CommentResolver {
     const { db } = context
     const commentService = new CommentService(db)
     return await commentService.deleteComment(id)
+  }
+
+  async searchComments(_parent, { query, limit, offset }, context) {
+    if (!context || !context.db) {
+      throw new Error('Database connection required')
+    }
+    const { db } = context
+    const commentService = new CommentService(db)
+    return await commentService.searchComments({ query, limit, offset })
   }
 }
 

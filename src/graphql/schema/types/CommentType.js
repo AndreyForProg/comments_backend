@@ -5,6 +5,7 @@ module.exports = `
     userId: ID!
     parentId: ID
     homePage: String
+    filePath: String
     user: User
     children: [Comment]
     createdAt: String
@@ -17,9 +18,15 @@ module.exports = `
     text: String!
     parentId: ID
     homePage: String
+    file: Upload
   }
 
   type CommentsResponse {
+    comments: [Comment]!
+    total: Int!
+  }
+
+  type SearchCommentsResponse {
     comments: [Comment]!
     total: Int!
   }

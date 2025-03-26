@@ -15,6 +15,8 @@ const typeDefs = gql`
   type Mutation {
     ${mutations}
   }
+
+  scalar Upload
 `
 
 const schema = makeExecutableSchema({
