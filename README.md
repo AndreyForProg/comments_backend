@@ -32,28 +32,11 @@ git clone <url-репозитория>
 
 npm install
 
-3. Обновите файл `.env` в корневой директории и добавьте необходимые переменные окружения:
-
-```env
-NODE_ENV=development
-BASE_URL=http://localhost:3010
-PORT=3010
-DB_HOST=localhost
-DB_USER=zen
-DB_PASSWORD=zenpass
-DB_NAME=comments_db
-ELASTICSEARCH_URL=http://localhost:9200
-```
-
-4. Запустите Docker-контейнеры для PostgreSQL и Elasticsearch:
+3. Запустите Docker-контейнеры для PostgreSQL и Elasticsearch:
 
 docker-compose up -d
 
-5. Выполните миграции базы данных:
-
-npm run db:migrate
-
-6. Запустите сервер:
+4. Запустите сервер:
 
 # Для разработки
 
@@ -63,7 +46,7 @@ npm run dev
 
 npm start
 
-7. Схему бд можно посмотреть в файле `comment_schema.mwb`
+5. Схему бд можно посмотреть в файле `comment_schema.mwb`
 
 ## API GraphQL
 
