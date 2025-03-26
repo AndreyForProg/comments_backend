@@ -3,8 +3,9 @@
     "username": "zen",
     "password": "zenpass",
     "database": "comments_db",
-    "host": "127.0.0.1",
-    "dialect": "postgres"
+    "host": "localhost",
+    "dialect": "postgres",
+    "port": 5432
   },
   "test": {
     "username": "root",
