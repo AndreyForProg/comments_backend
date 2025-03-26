@@ -1,14 +1,13 @@
 import express from 'express'
 import cors from 'cors'
 import { ApolloServer } from 'apollo-server-express'
-// const { graphqlUploadExpress } = require('graphql-upload')
+import { graphqlUploadExpress } from 'graphql-upload'
 import schema from './graphql/schema/index.js'
 import Database from './database/Database.js'
 import { createIndex } from '../config/elasticConf.js'
 import FileService from './services/FileService.js'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
