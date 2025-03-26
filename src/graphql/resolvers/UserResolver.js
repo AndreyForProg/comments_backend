@@ -1,4 +1,4 @@
-const { UserService } = require('../../services')
+import { UserService } from '../../services/index.js'
 
 class UserResolver {
   constructor() {
@@ -41,4 +41,4 @@ class UserResolver {
   }
 }
 
-module.exports = new UserResolver().resolvers
+export default new UserResolver().resolvers

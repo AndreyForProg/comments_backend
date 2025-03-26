@@ -84,4 +84,4 @@ class CommentValidator {
   }
 }
 
-module.exports = CommentValidator
+export default CommentValidator

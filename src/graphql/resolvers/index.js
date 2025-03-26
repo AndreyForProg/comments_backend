@@ -1,5 +1,5 @@
-const userResolvers = require('./UserResolver')
-const commentResolvers = require('./CommentResolver')
+import userResolvers from './UserResolver.js'
+import commentResolvers from './CommentResolver.js'
 
 const resolvers = {
   Query: {
@@ -12,4 +12,4 @@ const resolvers = {
   },
 }
 
-module.exports = resolvers
+export default resolvers

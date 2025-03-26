@@ -3,4 +3,4 @@ const userMutations = `
   deleteUser(id: ID!): Boolean
 `
 
-module.exports = userMutations
+export default userMutations

@@ -1,7 +1,7 @@
-const UserType = require('./UserType')
-const CommentType = require('./CommentType')
+import UserType from './UserType.js'
+import CommentType from './CommentType.js'
 
-module.exports = `
+export default `
   ${UserType}
   ${CommentType}
 `

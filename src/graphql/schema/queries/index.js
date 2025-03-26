@@ -1,7 +1,7 @@
-const userQueries = require('./userQueries')
-const commentQueries = require('./commentQueries')
+import userQueries from './userQueries.js'
+import commentQueries from './commentQueries.js'
 
-module.exports = `
+export default `
   ${userQueries}
   ${commentQueries}
 `

@@ -1,7 +1,7 @@
-const commentMutations = require('./commentMutations')
-const userMutations = require('./userMutations')
+import commentMutations from './commentMutations.js'
+import userMutations from './userMutations.js'
 
-module.exports = `
+export default `
   ${commentMutations}
   ${userMutations}
 `

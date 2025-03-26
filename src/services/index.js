@@ -1,7 +1,4 @@
-const CommentService = require('./CommentService')
-const UserService = require('./UserService')
+import CommentService from './CommentService.js'
+import UserService from './UserService.js'
 
-module.exports = {
-  CommentService,
-  UserService,
-}
+export { CommentService, UserService }

@@ -1,7 +1,11 @@
-const fs = require('fs')
-const fsPromises = require('fs').promises
-const path = require('path')
-const sharp = require('sharp')
+import fs from 'fs'
+import { promises as fsPromises } from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import sharp from 'sharp'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 class FileService {
   constructor() {
@@ -145,4 +149,4 @@ class FileService {
   }
 }
 
-module.exports = new FileService()
+export default new FileService()

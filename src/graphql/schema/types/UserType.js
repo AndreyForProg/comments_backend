@@ -19,4 +19,4 @@ const UserType = `
   }
 `
 
-module.exports = UserType
+export default UserType

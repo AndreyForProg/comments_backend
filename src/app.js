@@ -1,12 +1,17 @@
-const express = require('express')
-const cors = require('cors')
-const { ApolloServer } = require('apollo-server-express')
-const { graphqlUploadExpress } = require('graphql-upload')
-const schema = require('./graphql/schema')
-const Database = require('./database/Database')
-const { createIndex } = require('../config/elasticConf')
-const FileService = require('./services/FileService')
-const path = require('path')
+import express from 'express'
+import cors from 'cors'
+import { ApolloServer } from 'apollo-server-express'
+// const { graphqlUploadExpress } = require('graphql-upload')
+import schema from './graphql/schema/index.js'
+import Database from './database/Database.js'
+import { createIndex } from '../config/elasticConf.js'
+import FileService from './services/FileService.js'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import graphqlUploadExpress from 'graphql-upload/graphqlUploadExpress.mjs'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 class App {
   constructor() {
@@ -116,4 +121,4 @@ class App {
 
 const appInstance = new App()
 
-module.exports = { app: appInstance.app }
+export const app = appInstance.app

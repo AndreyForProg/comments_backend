@@ -1,5 +1,5 @@
-const { CommentService } = require('../../services')
-const CommentValidator = require('../../services/СommentValidatorService')
+import { CommentService } from '../../services/index.js'
+import CommentValidator from '../../services/СommentValidatorService.js'
 
 class CommentResolver {
   constructor() {
@@ -75,4 +75,4 @@ class CommentResolver {
   }
 }
 
-module.exports = new CommentResolver().resolvers
+export default new CommentResolver().resolvers

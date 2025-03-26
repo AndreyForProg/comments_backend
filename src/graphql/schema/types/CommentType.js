@@ -1,4 +1,4 @@
-module.exports = `
+export default `
   type Comment {
     id: ID!
     text: String!

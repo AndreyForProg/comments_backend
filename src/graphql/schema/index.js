@@ -1,9 +1,9 @@
-const { makeExecutableSchema } = require('@graphql-tools/schema')
-const { gql } = require('apollo-server-express')
-const types = require('./types')
-const queries = require('./queries')
-const mutations = require('./mutations')
-const resolvers = require('../resolvers')
+import { makeExecutableSchema } from '@graphql-tools/schema'
+import { gql } from 'apollo-server-express'
+import types from './types/index.js'
+import queries from './queries/index.js'
+import mutations from './mutations/index.js'
+import resolvers from '../resolvers/index.js'
 
 const typeDefs = gql`
   ${types}
@@ -24,4 +24,4 @@ const schema = makeExecutableSchema({
   resolvers,
 })
 
-module.exports = schema
+export default schema

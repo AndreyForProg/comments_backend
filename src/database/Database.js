@@ -1,4 +1,4 @@
-const db = require('../../models')
+import db from '../../models/index.js'
 
 class Database {
   constructor() {
@@ -50,4 +50,4 @@ class Database {
   }
 }
 
-module.exports = Database
+export default Database

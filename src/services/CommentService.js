@@ -1,6 +1,6 @@
-const { esClient } = require('../../config/elasticConf')
-const FileService = require('./FileService')
-const CommentValidator = require('./СommentValidatorService')
+import { esClient } from '../../config/elasticConf.js'
+import FileService from './FileService.js'
+import CommentValidator from './СommentValidatorService.js'
 
 class CommentService {
   constructor(db) {
@@ -329,4 +329,4 @@ class CommentService {
   }
 }
 
-module.exports = CommentService
+export default CommentService
