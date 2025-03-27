@@ -1,8 +1,10 @@
 FROM node:18-alpine
 
-# Настройка DNS для Alpine
-RUN echo "nameserver 1.1.1.1" > /etc/resolv.conf && \
-    echo "nameserver 8.8.8.8" >> /etc/resolv.conf
+# Установка переменных окружения для DNS
+ENV npm_config_registry=https://registry.npmmirror.com
+ENV npm_config_fetch_retries=5
+ENV npm_config_fetch_retry_maxtimeout=60000
+ENV npm_config_strict_ssl=false
 
 WORKDIR /app
 
@@ -12,14 +14,14 @@ RUN apk add --no-cache git
 # Копируем package.json
 COPY package*.json ./
 
-# Настройка npm и установка зависимостей
-RUN npm config set registry https://registry.npmmirror.com && \
-    npm config set fetch-retries 5 && \
-    npm config set fetch-retry-maxtimeout 60000 && \
-    npm config set strict-ssl false && \
-    npm install || \
-    (npm config set registry https://registry.npm.taobao.org && npm install) || \
-    (npm config set registry https://r.cnpmjs.org && npm install)
+# Установка зависимостей с несколькими попытками
+RUN for i in 1 2 3 4 5; do \
+        npm install && break || \
+        echo "Retry attempt $i..." && \
+        sleep 15 && \
+        if [ $i -eq 1 ]; then npm config set registry https://registry.npm.taobao.org; fi && \
+        if [ $i -eq 2 ]; then npm config set registry https://r.cnpmjs.org; fi; \
+    done
 
 COPY . .
 
