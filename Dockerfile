@@ -1,23 +1,22 @@
 FROM node:18.17.0
 
-WORKDIR /app
+# Настройка DNS Google
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf.override && \
+    echo "nameserver 8.8.4.4" >> /etc/resolv.conf.override && \
+    cp /etc/resolv.conf.override /etc/resolv.conf
 
-# Установка pnpm
-RUN npm install -g pnpm
+WORKDIR /app
 
 # Копирование package.json
 COPY package*.json ./
 
-# Настройка и установка зависимостей через pnpm
-RUN pnpm config set registry https://registry.npmjs.org/ \
-    && pnpm config set strict-ssl false \
-    && pnpm config set network-concurrency 1 \
-    && pnpm config set network-timeout 300000 \
-    && pnpm install --no-frozen-lockfile \
-    || pnpm install --registry=https://registry.npmmirror.com \
-    || pnpm install --registry=https://r.cnpmjs.org/
+# Базовая установка с повторными попытками
+RUN for i in 1 2 3 4 5; do \
+        npm install && break || \
+        echo "Retry attempt $i..." && \
+        sleep 10; \
+    done
 
 COPY . .
 
-# Запуск через pnpm
-CMD ["pnpm", "start"] 
+CMD ["node", "index.js"] 
