@@ -1,28 +1,30 @@
 FROM node:18-alpine
 
-# Установка переменных окружения для DNS
-ENV npm_config_registry=https://registry.npmmirror.com
-ENV npm_config_fetch_retries=5
-ENV npm_config_fetch_retry_maxtimeout=60000
-ENV npm_config_strict_ssl=false
+# Установка переменных окружения для npm
+ENV npm_config_registry=https://registry.npmmirror.com \
+    npm_config_fetch_retries=5 \
+    npm_config_fetch_retry_maxtimeout=60000 \
+    npm_config_strict_ssl=false \
+    npm_config_timeout=60000
 
 WORKDIR /app
 
-# Установка git
-RUN apk add --no-cache git
-
-# Копируем package.json
+# Копируем только необходимые файлы
 COPY package*.json ./
 
-# Установка зависимостей с несколькими попытками
+# Установка зависимостей с несколькими попытками и разными registry
 RUN for i in 1 2 3 4 5; do \
-        npm install && break || \
-        echo "Retry attempt $i..." && \
-        sleep 15 && \
-        if [ $i -eq 1 ]; then npm config set registry https://registry.npm.taobao.org; fi && \
-        if [ $i -eq 2 ]; then npm config set registry https://r.cnpmjs.org; fi; \
+        echo "Attempt $i: Installing dependencies..." && \
+        npm install --no-package-lock --no-audit || \
+        (npm config set registry https://registry.npm.taobao.org && npm install --no-package-lock --no-audit) || \
+        (npm config set registry https://r.cnpmjs.org && npm install --no-package-lock --no-audit) || \
+        continue && break; \
+        echo "Attempt $i failed. Waiting before retry..." && \
+        sleep 10; \
     done
 
+# Копируем остальные файлы проекта
 COPY . .
 
+# Запускаем приложение
 CMD ["node", "index.js"] 
