@@ -1,4 +1,12 @@
-FROM node:18-alpine
+FROM ubuntu:22.04
+
+# Установка Node.js
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs git && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -6,8 +14,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Устанавливаем зависимости с несколькими попытками
-RUN apk add --no-cache git && \
-    npm config set registry https://registry.npmmirror.com && \
+RUN npm config set registry https://registry.npmmirror.com && \
     npm config set fetch-retries 5 && \
     npm config set fetch-retry-maxtimeout 60000 && \
     npm install
