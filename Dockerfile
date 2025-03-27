@@ -2,20 +2,14 @@ FROM node:18.17.0
 
 WORKDIR /app
 
-# Копирование package.json
+# Установка cnpm
+RUN npm install -g cnpm --registry=https://registry.npmmirror.com
+
 COPY package*.json ./
 
-# Использование только китайского зеркала npm
-RUN npm config set registry https://registry.npmmirror.com \
-    && npm config set strict-ssl false \
-    && npm config set maxsockets 25 \
-    && npm config set fetch-retries 5 \
-    && npm config set fetch-retry-maxtimeout 60000 \
-    && npm config set fetch-retry-mintimeout 10000 \
-    && npm install --verbose
+# Установка зависимостей через cnpm
+RUN cnpm install
 
 COPY . .
-
-EXPOSE 3010
 
 CMD ["npm", "start"] 
