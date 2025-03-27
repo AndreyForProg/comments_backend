@@ -2,17 +2,22 @@ FROM node:18.17.0
 
 WORKDIR /app
 
+# Установка pnpm
+RUN npm install -g pnpm
+
 # Копирование package.json
 COPY package*.json ./
 
-# Установка зависимостей с использованием нескольких зеркал
-RUN npm config set registry https://registry.npmjs.org/ \
-    && npm config set strict-ssl false \
-    && npm install || \
-    npm install --registry=https://r.cnpmjs.org/ || \
-    npm install --registry=https://skimdb.npmjs.com/registry/
+# Настройка и установка зависимостей через pnpm
+RUN pnpm config set registry https://registry.npmjs.org/ \
+    && pnpm config set strict-ssl false \
+    && pnpm config set network-concurrency 1 \
+    && pnpm config set network-timeout 300000 \
+    && pnpm install --no-frozen-lockfile \
+    || pnpm install --registry=https://registry.npmmirror.com \
+    || pnpm install --registry=https://r.cnpmjs.org/
 
 COPY . .
 
-# Использование node напрямую вместо npm start
-CMD ["node", "index.js"] 
+# Запуск через pnpm
+CMD ["pnpm", "start"] 
