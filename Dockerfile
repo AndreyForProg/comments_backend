@@ -2,14 +2,17 @@ FROM node:18.17.0
 
 WORKDIR /app
 
-# Установка cnpm
-RUN npm install -g cnpm --registry=https://registry.npmmirror.com
-
+# Копирование package.json
 COPY package*.json ./
 
-# Установка зависимостей через cnpm
-RUN cnpm install
+# Установка зависимостей с использованием нескольких зеркал
+RUN npm config set registry https://registry.npmjs.org/ \
+    && npm config set strict-ssl false \
+    && npm install || \
+    npm install --registry=https://r.cnpmjs.org/ || \
+    npm install --registry=https://skimdb.npmjs.com/registry/
 
 COPY . .
 
-CMD ["npm", "start"] 
+# Использование node напрямую вместо npm start
+CMD ["node", "index.js"] 
