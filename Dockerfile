@@ -1,17 +1,16 @@
-FROM registry.npmmirror.com/node:18.17.0
+FROM node:18-alpine
 
 WORKDIR /app
 
 # Копируем сначала package.json
 COPY package*.json ./
 
-# Устанавливаем зависимости используя китайское зеркало npm
-RUN npm install --registry=https://registry.npmmirror.com \
-    --network-timeout=100000 \
-    --fetch-retries=5 \
-    --fetch-retry-factor=2 \
-    --fetch-retry-mintimeout=20000 \
-    --fetch-retry-maxtimeout=120000
+# Устанавливаем зависимости с несколькими попытками
+RUN apk add --no-cache git && \
+    npm config set registry https://registry.npmmirror.com && \
+    npm config set fetch-retries 5 && \
+    npm config set fetch-retry-maxtimeout 60000 && \
+    npm install
 
 COPY . .
 
