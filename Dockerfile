@@ -1,23 +1,25 @@
-FROM ubuntu:22.04
+FROM node:18-alpine
 
-# Установка Node.js
-RUN apt-get update && \
-    apt-get install -y curl && \
-    curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs git && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Настройка DNS для Alpine
+RUN echo "nameserver 1.1.1.1" > /etc/resolv.conf && \
+    echo "nameserver 8.8.8.8" >> /etc/resolv.conf
 
 WORKDIR /app
 
-# Копируем сначала package.json
+# Установка git
+RUN apk add --no-cache git
+
+# Копируем package.json
 COPY package*.json ./
 
-# Устанавливаем зависимости с несколькими попытками
+# Настройка npm и установка зависимостей
 RUN npm config set registry https://registry.npmmirror.com && \
     npm config set fetch-retries 5 && \
     npm config set fetch-retry-maxtimeout 60000 && \
-    npm install
+    npm config set strict-ssl false && \
+    npm install || \
+    (npm config set registry https://registry.npm.taobao.org && npm install) || \
+    (npm config set registry https://r.cnpmjs.org && npm install)
 
 COPY . .
 
