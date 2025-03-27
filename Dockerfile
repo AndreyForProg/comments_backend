@@ -1,30 +1,29 @@
-FROM node:18-alpine
+# Первый этап - установка зависимостей
+FROM node:18-alpine AS deps
 
-# Установка переменных окружения для npm
-ENV npm_config_registry=https://registry.npmmirror.com \
-    npm_config_fetch_retries=5 \
-    npm_config_fetch_retry_maxtimeout=60000 \
-    npm_config_strict_ssl=false \
-    npm_config_timeout=60000
+# Установка git
+RUN apk add --no-cache git
 
 WORKDIR /app
 
-# Копируем только необходимые файлы
+# Копирование package.json
 COPY package*.json ./
 
-# Установка зависимостей с несколькими попытками и разными registry
-RUN for i in 1 2 3 4 5; do \
-        echo "Attempt $i: Installing dependencies..." && \
-        npm install --no-package-lock --no-audit || \
-        (npm config set registry https://registry.npm.taobao.org && npm install --no-package-lock --no-audit) || \
-        (npm config set registry https://r.cnpmjs.org && npm install --no-package-lock --no-audit) || \
-        continue && break; \
-        echo "Attempt $i failed. Waiting before retry..." && \
-        sleep 10; \
-    done
+# Установка зависимостей через несколько разных источников
+RUN npm config set registry https://registry.npm.taobao.org && \
+    npm config set strict-ssl false && \
+    npm config set fetch-retries 3 && \
+    npm install || \
+    (npm config set registry https://r.cnpmjs.org && npm install) || \
+    (npm config set registry=https://registry.npmmirror.com && npm install)
 
-# Копируем остальные файлы проекта
+# Второй этап - финальный образ
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Копируем установленные зависимости и исходный код
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Запускаем приложение
 CMD ["node", "index.js"] 
